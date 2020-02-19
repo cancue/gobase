@@ -3,22 +3,27 @@ Package gobase is a web framework with basic settings and structure, wrapping la
 
 Example:
 	package main
+
 	import (
 		"net/http"
+
 		"github.com/cancue/gobase"
+		"github.com/labstack/echo/v4"
 		"github.com/labstack/echo/v4/middleware"
 	)
+
 	// Handler
-	func hello(c gobase.Context) error {
+	func hello(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	}
+
 	func main() {
 		// Gobase instance
-		g := gobase.NewWithConfig(gobase.Config{
-			Stage: "local",
-			Name: "gobase-example",
-			Port: 65535,
-			ReadTimeout: 0,
+		g := gobase.NewWithConfig(&gobase.Config{
+			Stage:        "local",
+			Name:         "gobase-example",
+			Port:         ":65533",
+			ReadTimeout:  0,
 			WriteTimeout: 0,
 		})
 		// Middleware
