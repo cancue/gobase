@@ -4,8 +4,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
-	"runtime"
 
 	"gopkg.in/yaml.v3"
 )
@@ -18,13 +16,6 @@ func GetEnv(key string, placeholder string) (value string) {
 	}
 
 	return
-}
-
-// CallerDir retrives the path of caller for this method.
-func CallerDir() string {
-	_, b, _, _ := runtime.Caller(0)
-
-	return path.Dir(b)
 }
 
 // ReadYAMLFile returns a yaml file corresponding to the path in an operable form.

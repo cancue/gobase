@@ -41,14 +41,10 @@ package gobase
 import (
 	"encoding/json"
 	"net/http"
-	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
-
-	"github.com/cancue/gobase/util"
 )
 
 type (
@@ -80,25 +76,6 @@ var (
 
 	gobase *Server
 )
-
-// New returns server with Config by config/{stage}.yaml written in suggested form.
-func New(stage string) *Server {
-	path := filepath.Join(util.CallerDir(), "config", stage+".yaml")
-	yaml := util.ReadYAMLFile(path)
-
-	server := yaml["server"].(map[string]interface{})
-	timeout := server["timeout"].(map[string]interface{})
-
-	config := Config{
-		Stage:        stage,
-		Name:         server["name"].(string),
-		Port:         ":" + strconv.Itoa(server["port"].(int)),
-		ReadTimeout:  time.Duration(timeout["read"].(int)) * time.Second,
-		WriteTimeout: time.Duration(timeout["read"].(int)) * time.Second,
-	}
-
-	return NewWithConfig(&config)
-}
 
 // NewWithConfig returns server with CustomConfig.
 func NewWithConfig(config *Config) *Server {

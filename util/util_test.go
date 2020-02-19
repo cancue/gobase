@@ -27,14 +27,6 @@ func TestGetEnv(t *testing.T) {
 	})
 }
 
-func TestRootDir(t *testing.T) {
-	expect, _ := os.Getwd()
-
-	result := CallerDir()
-
-	assert.Equal(t, expect, result)
-}
-
 func TestReadYAMLFile(t *testing.T) {
 	t.Run("should panic if file does not exist", func(t *testing.T) {
 		defer func() {
