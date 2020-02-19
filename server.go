@@ -2,32 +2,33 @@
 Package gobase is a web framework with basic settings and structure, wrapping labstack/echo.
 
 Example:
-  package main
-  import (
-    "net/http"
-    "github.com/cancue/gobase
+	package main
+	import (
+		"net/http"
+		"github.com/cancue/gobase"
 		"github.com/labstack/echo/v4/middleware"
-  )
-  // Handler
-  func hello(c gobase.Context) error {
-    return c.String(http.StatusOK, "Hello, World!")
-  }
-  func main() {
-    // Gobase instance
-    g := gobase.NewWithConfig(gobase.Config{
+	)
+	// Handler
+	func hello(c gobase.Context) error {
+		return c.String(http.StatusOK, "Hello, World!")
+	}
+	func main() {
+		// Gobase instance
+		g := gobase.NewWithConfig(gobase.Config{
 			Stage: "local",
 			Name: "gobase-example",
 			Port: 65535,
 			ReadTimeout: 0,
 			WriteTimeout: 0,
 		})
-    // Middleware
+		// Middleware
 		g.Use(middleware.Secure())
-    // Routes
-    g.GET("/", hello)
-    // Start server
+		// Routes
+		g.GET("/", hello)
+		// Start server
 		g.Start()
-  }
+	}
+
 You may want to check out https://github.com/cancue/gobase-demo
 */
 package gobase
