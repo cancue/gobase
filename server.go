@@ -105,6 +105,11 @@ func (s *Server) Use(middleware ...echo.MiddlewareFunc) {
 	s.echo.Use(middleware...)
 }
 
+// Group for middleware is an alias for labstack/echo.
+func (s *Server) Group(prefix string, m ...echo.MiddlewareFunc) *echo.Group {
+	return s.echo.Group(prefix, m...)
+}
+
 // Routes returns labstack/echo Routes result in marshalled json.
 func (s *Server) Routes() (data []byte, err error) {
 	routes := s.echo.Routes()
