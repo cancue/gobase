@@ -51,7 +51,7 @@ type (
 	// Server is the top-level framework instance.
 	Server struct {
 		Config     *Config
-		Logger     *logrus.Logger
+		Logger     Logger
 		echo       *echo.Echo
 		httpConfig http.Server
 	}
@@ -64,6 +64,12 @@ type (
 		ReadTimeout       time.Duration
 		WriteTimeout      time.Duration
 		HTTPRequestLogger bool
+	}
+
+	// Logger is used for server startup and http error handler.
+	Logger interface {
+		Error(args ...interface{})
+		Fatal(args ...interface{})
 	}
 
 	// Context for controller is an alias for labstack/echo

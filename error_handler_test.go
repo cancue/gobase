@@ -13,11 +13,13 @@ import (
 
 func TestHTTPErrorHandler(t *testing.T) {
 	existing := gobase
-	gobase = new(Server)
-	gobase.Logger = logrus.New()
-
 	buf := new(bytes.Buffer)
-	gobase.Logger.Out = buf
+	gobase = new(Server)
+
+	logger := logrus.New()
+	logger.Out = buf
+	gobase.Logger = logger
+
 	defer func() {
 		gobase = existing
 	}()
