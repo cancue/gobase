@@ -111,11 +111,6 @@ func (s *Server) Use(middleware ...echo.MiddlewareFunc) {
 	s.echo.Use(middleware...)
 }
 
-// Group for middleware is an alias for labstack/echo.
-func (s *Server) Group(prefix string, m ...echo.MiddlewareFunc) *echo.Group {
-	return s.echo.Group(prefix, m...)
-}
-
 // Routes returns labstack/echo Routes result in marshalled json.
 func (s *Server) Routes() (data []byte, err error) {
 	routes := s.echo.Routes()
@@ -125,6 +120,11 @@ func (s *Server) Routes() (data []byte, err error) {
 	}
 
 	return
+}
+
+// Group for router is an alias for labstack/echo.
+func (s *Server) Group(prefix string, m ...echo.MiddlewareFunc) *echo.Group {
+	return s.echo.Group(prefix, m...)
 }
 
 // GET for router is an alias for labstack/echo.
@@ -145,4 +145,19 @@ func (s *Server) PUT(path string, controller echo.HandlerFunc, m ...echo.Middlew
 // DELETE for router is an alias for labstack/echo.
 func (s *Server) DELETE(path string, controller echo.HandlerFunc, m ...echo.MiddlewareFunc) {
 	s.echo.DELETE(path, controller, m...)
+}
+
+// PATCH for router is an alias for labstack/echo.
+func (s *Server) PATCH(path string, controller echo.HandlerFunc, m ...echo.MiddlewareFunc) {
+	s.echo.PATCH(path, controller, m...)
+}
+
+// OPTIONS for router is an alias for labstack/echo.
+func (s *Server) OPTIONS(path string, controller echo.HandlerFunc, m ...echo.MiddlewareFunc) {
+	s.echo.OPTIONS(path, controller, m...)
+}
+
+// HEAD for router is an alias for labstack/echo.
+func (s *Server) HEAD(path string, controller echo.HandlerFunc, m ...echo.MiddlewareFunc) {
+	s.echo.HEAD(path, controller, m...)
 }
