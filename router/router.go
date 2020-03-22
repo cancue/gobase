@@ -30,7 +30,7 @@ type (
 // Context is for controller.
 type Context echo.Context
 type ctrlr interface {
-	Exec(echo.Context) (interface{}, error)
+	Exec(Context) (interface{}, error)
 }
 
 // Controller returns echo controller from a struct written in suggested form.

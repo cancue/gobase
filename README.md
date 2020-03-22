@@ -1,6 +1,6 @@
 # gobase
 
-[![godoc - documentation](https://godoc.org/github.com/cancue/gobase?status.svg)](https://pkg.go.dev/github.com/cancue/gobase@v0.2.0)
+[![godoc - documentation](https://godoc.org/github.com/cancue/gobase?status.svg)](https://pkg.go.dev/github.com/cancue/gobase@v0.2.1)
 [![go report card](https://goreportcard.com/badge/github.com/cancue/gobase)](https://goreportcard.com/report/github.com/cancue/gobase)
 [![codecov - code coverage](https://img.shields.io/codecov/c/github/cancue/gobase.svg?style=flat-square)](https://codecov.io/gh/cancue/gobase)
 [![github action - test](https://github.com/cancue/gobase/workflows/test/badge.svg)](https://github.com/cancue/gobase/actions)

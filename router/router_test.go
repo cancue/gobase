@@ -15,7 +15,7 @@ type mockController struct {
 	Error bool   `json:"error" query:"error" param:"error"`
 }
 
-func (mc *mockController) Exec(_ echo.Context) (interface{}, error) {
+func (mc *mockController) Exec(_ Context) (interface{}, error) {
 	if mc.Error {
 		err := errors.New("")
 		return mc.Input, err
