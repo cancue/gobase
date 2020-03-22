@@ -1,13 +1,15 @@
-package gobase
+package http
 
 import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+
+	"github.com/cancue/gobase/logger"
 )
 
-// httpErrorHandler is for logging internal server errors.
-func httpErrorHandler(err error, c echo.Context) {
+// ErrorHandler is for logging internal server errors.
+func ErrorHandler(err error, c echo.Context) {
 	if c.Response().Committed {
 		return
 	}
@@ -15,7 +17,7 @@ func httpErrorHandler(err error, c echo.Context) {
 	// Set err
 	e, ok := err.(*echo.HTTPError)
 	if !ok {
-		gobase.Logger.Error(err)
+		logger.Get().Error(err)
 		e = &echo.HTTPError{
 			Code:    http.StatusInternalServerError,
 			Message: http.StatusText(http.StatusInternalServerError),
@@ -28,7 +30,7 @@ func httpErrorHandler(err error, c echo.Context) {
 		}
 	}
 
-	// Issue #1426
+	// TODO github.com/labstack/echo - Issue #1426
 	code := e.Code
 	message := e.Message
 
@@ -37,13 +39,13 @@ func httpErrorHandler(err error, c echo.Context) {
 	}
 
 	// Send response
-	if c.Request().Method == http.MethodHead { // Issue #608
+	if c.Request().Method == http.MethodHead { // TODO github.com/labstack/echo - Issue #608
 		err = c.NoContent(e.Code)
 	} else {
 		err = c.JSON(code, message)
 	}
 
 	if err != nil {
-		gobase.Logger.Error(err)
+		logger.Get().Error(err)
 	}
 }

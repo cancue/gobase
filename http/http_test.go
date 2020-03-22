@@ -1,4 +1,4 @@
-package gobase
+package http
 
 import (
 	"bytes"
@@ -7,22 +7,26 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/cancue/gobase/config"
+	"github.com/cancue/gobase/logger"
 )
 
+func init() {
+	conf := config.Config{
+		YAML: map[string]interface{}{
+			"name": "gobase",
+		},
+		Stage: "test",
+	}
+	logger.Set(&conf)
+}
+
 func TestHTTPErrorHandler(t *testing.T) {
-	existing := gobase
 	buf := new(bytes.Buffer)
-	gobase = new(Server)
-
-	logger := logrus.New()
-	logger.Out = buf
-	gobase.Logger = logger
-
-	defer func() {
-		gobase = existing
-	}()
+	lgr := logger.Get().(*logger.DefaultLogger)
+	lgr.Logger.Out = buf
 
 	t.Run("HTTP Error", func(t *testing.T) {
 		server := echo.New()
@@ -30,7 +34,7 @@ func TestHTTPErrorHandler(t *testing.T) {
 		ctx := server.NewContext(httptest.NewRequest("get", "/", nil), res)
 		err := echo.NewHTTPError(400, "raboof")
 
-		httpErrorHandler(err, ctx)
+		ErrorHandler(err, ctx)
 		result := buf.String()
 
 		assert.Zero(t, result)
@@ -43,7 +47,7 @@ func TestHTTPErrorHandler(t *testing.T) {
 		expect := "foobar"
 		err := errors.New(expect)
 
-		httpErrorHandler(err, ctx)
+		ErrorHandler(err, ctx)
 		result := buf.String()
 
 		assert.Contains(t, result, expect)

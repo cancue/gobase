@@ -1,4 +1,4 @@
-package gobase
+package validator
 
 import (
 	"reflect"
@@ -7,38 +7,36 @@ import (
 	validation "github.com/go-playground/validator/v10"
 )
 
-type (
-	// ValidationError describes the error information in the format for the end user.
-	ValidationError struct {
-		Message       string              `json:"message"`
-		InvalidFields []map[string]string `json:"invalidFields"`
-	}
-)
+// ErrMap describes the error information in the format for the end user.
+type ErrMap struct {
+	Message       string              `json:"message"`
+	InvalidFields []map[string]string `json:"invalidFields"`
+}
 
 var (
-	// Validator is an alias for go-playground/validator
-	Validator *validation.Validate
+	// Validate is an alias for go-playground/validator
+	Validate *validation.Validate
 )
 
 func init() {
-	Validator = validation.New()
+	Validate = validation.New()
 
 	// register json key as Field.
-	Validator.RegisterTagNameFunc(func(fld reflect.StructField) (name string) {
+	Validate.RegisterTagNameFunc(func(fld reflect.StructField) (name string) {
 		name = strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
 
 		return
 	})
 }
 
-// NewInvalidErrorMap returns rich error message.
-func NewInvalidErrorMap(err error) interface{} {
+// NewInvalidErrMap returns rich error message.
+func NewInvalidErrMap(err error) *ErrMap {
 	validationErrors, ok := err.(validation.ValidationErrors)
 	if !ok {
-		return "invalid Field"
+		return &ErrMap{Message: "invalid Field"}
 	}
 
-	verr := new(ValidationError)
+	verr := new(ErrMap)
 
 	if len(validationErrors) > 1 {
 		verr.Message = "some fields are invalid"

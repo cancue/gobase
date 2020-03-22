@@ -1,4 +1,4 @@
-package gobase
+package validator
 
 import (
 	"errors"
@@ -27,12 +27,12 @@ func (f FieldError) Kind() (result reflect.Kind)               { return }
 func (f FieldError) Type() (result reflect.Type)               { return }
 func (f FieldError) Translate(_ ut.Translator) (result string) { return }
 
-func TestNewInvalidErrorMap(t *testing.T) {
+func TestNewInvalidErrMap(t *testing.T) {
 	t.Run("invalid error", func(t *testing.T) {
 		expect := "invalid Field"
-		result := NewInvalidErrorMap(errors.New(""))
+		result := NewInvalidErrMap(errors.New(""))
 
-		assert.Equal(t, expect, result)
+		assert.Equal(t, expect, result.Message)
 	})
 
 	t.Run("single invalid field", func(t *testing.T) {
@@ -43,14 +43,14 @@ func TestNewInvalidErrorMap(t *testing.T) {
 		verr := validation.ValidationErrors{
 			mockFieldError,
 		}
-		expect := ValidationError{
+		expect := ErrMap{
 			"email field is invalid",
 			[]map[string]string{
 				{"email": "max 64"},
 			},
 		}
 
-		result := NewInvalidErrorMap(verr).(*ValidationError)
+		result := NewInvalidErrMap(verr)
 
 		assert.Equal(t, expect, *result)
 		mockFieldError.AssertExpectations(t)
@@ -69,7 +69,7 @@ func TestNewInvalidErrorMap(t *testing.T) {
 			emailError,
 			passwordError,
 		}
-		expect := ValidationError{
+		expect := ErrMap{
 			"some fields are invalid",
 			[]map[string]string{
 				{"email": "max 64"},
@@ -77,7 +77,7 @@ func TestNewInvalidErrorMap(t *testing.T) {
 			},
 		}
 
-		result := NewInvalidErrorMap(verr).(*ValidationError)
+		result := NewInvalidErrMap(verr)
 
 		assert.Equal(t, expect, *result)
 		emailError.AssertExpectations(t)
