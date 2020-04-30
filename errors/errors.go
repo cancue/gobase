@@ -40,7 +40,7 @@ func (err *Err) Error() string {
 		return "debug\n"
 	}
 
-	return err.Error()
+	return err.raw.Error()
 }
 
 // Wrap wraps error with additional data and stack info.
