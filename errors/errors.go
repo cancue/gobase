@@ -30,17 +30,17 @@ func callers() *stack {
 
 // Err is rich error struct.
 type Err struct {
-	raw  error
+	Raw  error
 	Data interface{}
 	*stack
 }
 
 func (err *Err) Error() string {
-	if err.raw == nil {
+	if err.Raw == nil {
 		return "debug\n"
 	}
 
-	return err.raw.Error()
+	return err.Raw.Error()
 }
 
 // Wrap wraps error with additional data and stack info.
