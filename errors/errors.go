@@ -1,68 +1,51 @@
 package errors
 
 import (
-	"runtime"
-
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
+	"github.com/gofiber/fiber/v2"
 )
 
-// NewHTTPError returns error with http status code.
-var NewHTTPError = echo.NewHTTPError
+// NewHTTPError is fiber.NewError wrapper.
+var NewHTTPError = fiber.NewError
 
-type stack []uintptr
+// FiberErrorHandler is a fiber.Config parameter.
+var FiberErrorHandler = func(ctx *fiber.Ctx, err error) error {
+	// Statuscode defaults to 500
+	code := fiber.StatusInternalServerError
+	msg := err.Error()
 
-func (s *stack) Trace() errors.StackTrace {
-	f := make([]errors.Frame, len(*s))
-	for i := 0; i < len(f); i++ {
-		f[i] = errors.Frame((*s)[i])
-	}
-	return f
-}
-
-func callers() *stack {
-	const depth = 8
-	var pcs [depth]uintptr
-	n := runtime.Callers(3, pcs[:])
-	var st stack = pcs[0:n]
-	return &st
-}
-
-// Err is rich error struct.
-type Err struct {
-	Raw  error
-	Data interface{}
-	*stack
-}
-
-func (err *Err) Error() string {
-	if err.Raw == nil {
-		return "debug\n"
+	if e, ok := err.(*fiber.Error); ok {
+		code = e.Code
 	}
 
-	return err.Raw.Error()
+	if code == 500 {
+		msg = "Internal Server Error"
+		LogError(err)
+	}
+
+	ctx.Set(fiber.HeaderContentType, fiber.MIMETextPlainCharsetUTF8)
+	return ctx.Status(code).SendString(msg)
 }
 
 // Wrap wraps error with additional data and stack info.
 func Wrap(err error, data interface{}) error {
-	if _, ok := err.(*Err); ok {
+	if _, ok := err.(*richError); ok {
 		return err
 	}
 
-	if _, ok := err.(*echo.HTTPError); ok {
+	if _, ok := err.(*fiber.Error); ok {
 		return err
 	}
 
-	return &Err{
+	return &richError{
 		err,
 		data,
 		callers(),
 	}
 }
 
-// Debug returns anyway error for debugging.
+// Debug returns any data as error for debugging.
 func Debug(data interface{}) error {
-	return &Err{
+	return &richError{
 		nil,
 		data,
 		callers(),

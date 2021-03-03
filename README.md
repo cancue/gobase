@@ -5,7 +5,7 @@
 [![codecov - code coverage](https://img.shields.io/codecov/c/github/cancue/gobase.svg?style=flat-square)](https://codecov.io/gh/cancue/gobase)
 [![github action - test](https://github.com/cancue/gobase/workflows/test/badge.svg)](https://github.com/cancue/gobase/actions)
 
-**gobase** is a web framework with basic settings and structure, wrapping [echo](https://github.com/labstack/echo).
+**gobase** is a web framework with basic settings and structure, wrapping [fiber](https://github.com/gofiber/fiber).
 
 ## Installation
 ```go
@@ -17,38 +17,27 @@ go get github.com/cancue/gobase
 package main
 
 import (
-  "net/http"
-
-  "github.com/labstack/echo/v4"
-
-  "github.com/cancue/gobase"
-  "github.com/cancue/gobase/config"
-  "github.com/cancue/gobase/router"
+	"github.com/cancue/gobase"
+	"github.com/cancue/gobase/config"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
-  gb := gobase.Server{
-    Config: &config.Config{
-      Stage: "local",
-      YAML: map[string]interface{}{
-        "name": "gobase-demo",
-        "server": map[string]interface{}{
-          "port": 8888,
-          "timeout": map[string]interface{}{
-            "read":  600,
-            "write": 600,
-          },
-        },
-      },
-    },
-    Router: func(s router.Server) {
-      s.GET("/", func(ctx echo.Context) error {
-        return ctx.String(http.StatusOK, "Hello, World!")
-      })
-    },
-  }
+	config := config.Config{
+		Stage:        "local",
+		Name:         "gobase",
+		Domain:       "localhost",
+		Port:         3000,
+		AllowOrigins: []string{"http://localhost:3000"},
+	}
 
-  gb.Start()
+	gobase.Start(&config, router)
+}
+
+func router(app *fiber.App) {
+	app.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.SendString("Hello, World 👋!")
+	})
 }
 ```
 

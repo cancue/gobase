@@ -1,76 +1,80 @@
-/*
-Package config has weakness because of lenCaller.
-
-Gobase.Start must be called in the same path with the config folder.
-It is a fragile assumption, but worth it. Because Gobase is made for personal simplicity.
-*/
 package config
 
 import (
-	"io/ioutil"
 	"os"
-	"path"
-	"path/filepath"
-	"runtime"
 	"sync"
 
-	"github.com/cancue/gobase/util"
 	"gopkg.in/yaml.v3"
 )
 
-var configOnce = new(sync.Once)
-var config = new(Config)
-
-// Config public
+// Config .
 type Config struct {
-	Stage string
-	YAML  map[string]interface{}
+	Stage        string
+	Name         string
+	Domain       string
+	Port         int
+	AllowOrigins []string
+	YAML         map[string]interface{}
 }
 
-// Get retrieves config
+// Get retrieves config.
 func Get() *Config {
 	return config
 }
 
-// Set sets and retrieves Config from yaml files on config directory.
-//
-// relativeDepth format follows '.', '..', '../..'...
-// The name of the yaml file is determined by an environment variable whose key is 'STAGE'.
-// If there is no environment variable, 'local' is selected by default. (e.g. 'local.yaml')
-func Set(realativeDepth string) *Config {
-	return SetWithCallerLength(0, realativeDepth)
-}
+// Set set config to use globally.
+func Set(conf *Config) {
+	if config != nil {
+		panic("config already set")
+	}
 
-// SetWithCallerLength is same as Set but requires an extra caller length.
-func SetWithCallerLength(callerLength int, relativeDepth string) *Config {
-	configOnce.Do(func() {
-		config.Stage = util.GetEnv("STAGE", "local")
-		_, b, _, _ := runtime.Caller(5 + callerLength)
-		path := filepath.Join(path.Dir(b), relativeDepth, "config", config.Stage+".yaml")
-		config.YAML = readYAMLFileWithEnvs(path)
+	action.Do(func() {
+		config = conf
 	})
-
-	return config
 }
 
-func readYAMLFileWithEnvs(p string) (result map[string]interface{}) {
-	file, err := os.Open(p)
+// SetYAMLs set config from stage-yaml mapped argument.
+func SetYAMLs(yamlFiles map[string][]byte) {
+	stage := getEnv("STAGE", "local")
+	yaml := unmarshalYAML(yamlFiles[stage])
+	name := yaml["name"].(string)
+	server := yaml["server"].(map[string]interface{})
+	port := server["port"].(int)
+	domain := server["domain"].(string)
+
+	var allowOrigins []string
+	for _, v := range server["allow-origins"].([]interface{}) {
+		allowOrigins = append(allowOrigins, v.(string))
+	}
+
+	Set(&Config{
+		Stage:        stage,
+		Name:         name,
+		Domain:       domain,
+		Port:         port,
+		AllowOrigins: allowOrigins,
+		YAML:         yaml,
+	})
+}
+
+/* private */
+
+var action = new(sync.Once)
+var config *Config
+
+// getEnv retrieves the value of the environment variable named by envkey or returns placeholder.
+func getEnv(envkey, placeholder string) (value string) {
+	value = os.Getenv(envkey)
+	if len(value) == 0 {
+		value = placeholder
+	}
+	return
+}
+
+func unmarshalYAML(bytes []byte) (result map[string]interface{}) {
+	err := yaml.Unmarshal(bytes, &result)
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
-
-	bytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		panic(err)
-	}
-
-	str := os.ExpandEnv(string(bytes))
-
-	err = yaml.Unmarshal([]byte(str), &result)
-	if err != nil {
-		panic(err)
-	}
-
 	return
 }
